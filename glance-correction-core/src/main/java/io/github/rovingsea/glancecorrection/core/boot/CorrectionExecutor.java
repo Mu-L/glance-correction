@@ -28,10 +28,14 @@ public class CorrectionExecutor {
      */
     private final CountDownLatch countDownLatch;
 
-    public CorrectionExecutor(Connection conn, Class<?> targetObjectClass, int targetTableColumnSize) {
+    private final ExecutionAroundProcessor executionAroundProcessor;
+
+    public CorrectionExecutor(Connection conn, Class<?> targetObjectClass, int targetTableColumnSize,
+                              ExecutionAroundProcessor executionAroundProcessor) {
         this.conn = conn;
         this.targetObjectClass = targetObjectClass;
         this.countDownLatch = new CountDownLatch(targetTableColumnSize);
+        this.executionAroundProcessor = executionAroundProcessor;
     }
 
     private Map<Class<?>, Object> curIndexSourceData;
@@ -72,8 +76,16 @@ public class CorrectionExecutor {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-
-        this.conn.insert(instance);
+        if (executionAroundProcessor == null) {
+            this.conn.insert(instance);
+        } else {
+            this.executionAroundProcessor.postProcessBeforeExecution(curIndexSourceData,
+                    targetObjectClass, conn, instance);
+            this.executionAroundProcessor.processExecution(curIndexSourceData,
+                    targetObjectClass, conn, instance);
+            this.executionAroundProcessor.postProcessAfterExecution(curIndexSourceData,
+                    targetObjectClass, conn, instance);
+        }
     }
 
     /**

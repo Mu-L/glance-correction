@@ -113,7 +113,8 @@ public class CorrectionBoot implements ApplicationContextAware {
         Connection conn = correction.getConnectionBuilder().buildConnection();
         Class<?> targetObjectClass = correction.getTargetObjectClass();
         int length = targetObjectClass.getFields().length;
-        return new CorrectionExecutor(conn, targetObjectClass, length);
+        ExecutionAroundProcessor executionAroundProcessor = correction.getExecutionAroundProcessor();
+        return new CorrectionExecutor(conn, targetObjectClass, length, executionAroundProcessor);
     }
 
     /**

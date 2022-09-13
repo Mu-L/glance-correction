@@ -1,8 +1,9 @@
 package io.github.rovingsea.glancecorrection.core;
 
+import org.springframework.util.CollectionUtils;
+import io.github.rovingsea.glancecorrection.core.boot.ExecutionAroundProcessor;
 import io.github.rovingsea.glancecorrection.core.datasource.Connection;
 import io.github.rovingsea.glancecorrection.core.datasource.ConnectionBuilder;
-import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,9 +43,13 @@ public class Correction {
      */
     private final Map<Class<?>, List<?>> sourceData = new HashMap<>();
 
-    public Correction(Class<?> targetObjectClass, ConnectionBuilder connectionBuilder) {
+    private final ExecutionAroundProcessor executionAroundProcessor;
+
+    public Correction(Class<?> targetObjectClass, ConnectionBuilder connectionBuilder,
+                      ExecutionAroundProcessor executionAroundProcessor) {
         this.targetObjectClass = targetObjectClass;
         this.connectionBuilder = connectionBuilder;
+        this.executionAroundProcessor = executionAroundProcessor;
     }
 
     public void addSourceData(Map<Class<?>, List<?>> sourceData) {
@@ -71,6 +76,10 @@ public class Correction {
         return sourceData;
     }
 
+    public ExecutionAroundProcessor getExecutionAroundProcessor() {
+        return executionAroundProcessor;
+    }
+
     public static Builder newBuilder() {
         return new Builder(new SourceData());
     }
@@ -86,6 +95,8 @@ public class Correction {
 
         private ConnectionBuilder connectionBuilder;
 
+        private ExecutionAroundProcessor executionAroundProcessor;
+
         private final Map<String, Logic> columnLogics = new HashMap<>();
 
         public Builder(SourceData sourceData) {
@@ -94,6 +105,7 @@ public class Correction {
 
         /**
          * 设置目标表的 class
+         *
          * @param targetObjectClass 目标表的 class
          */
         public void targetObjectClass(Class<?> targetObjectClass) {
@@ -102,8 +114,9 @@ public class Correction {
 
         /**
          * 目标表某一列的转换逻辑
+         *
          * @param column 列名
-         * @param logic 转换逻辑
+         * @param logic  转换逻辑
          * @return 自己
          */
         public Builder column(String column, Logic logic) {
@@ -115,9 +128,13 @@ public class Correction {
             this.connectionBuilder = connectionBuilder;
         }
 
+        public void setExecutionAroundProcessor(ExecutionAroundProcessor executionAroundProcessor) {
+            this.executionAroundProcessor = executionAroundProcessor;
+        }
+
         Correction build() {
             Correction correction = new Correction(this.targetObjectClass,
-                    this.connectionBuilder);
+                    this.connectionBuilder, this.executionAroundProcessor);
             correction.addColumLogic(columnLogics);
             correction.addSourceData(this.sourceData.all);
             return correction;
@@ -128,7 +145,7 @@ public class Correction {
 
     /**
      * <p>
-     * 为订正建造器 {@link Correction.Builder} 用于设置来源数据，
+     * 为订正建造器 {@link Builder} 用于设置来源数据，
      * 而订正建造器将会借助它来完成来源数据的装配，起承上启下的作用
      * </p>
      */
