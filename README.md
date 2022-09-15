@@ -127,6 +127,14 @@
   }
   ```
 
+### 第七步：效果展示
+#### 来源表from1数据
+![from1表](docs/image/sample/from1.png)
+#### 来源表from2数据
+![from2表](docs/image/sample/from2.png)
+#### 订正后的目标表to1数据
+![to1表](docs/image/sample/to1.jpg)
+
 ## 帮助文档
 
 * 使用案例见：[使用案例](https://github.com/RovingSea/glance-correction/tree/develop/glance-correction-sample)
