@@ -5,6 +5,8 @@ import io.github.rovingsea.glancecorrection.core.CorrectionConfiguration;
 import io.github.rovingsea.glancecorrection.core.CorrectionLoader;
 import io.github.rovingsea.glancecorrection.core.Logic;
 import io.github.rovingsea.glancecorrection.core.datasource.Connection;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -24,6 +26,8 @@ import java.util.*;
  * @since 1.0.0
  */
 public class CorrectionBoot implements ApplicationContextAware {
+
+    private final Log logger = LogFactory.getLog(getClass());
 
     private ApplicationContext applicationContext;
 
@@ -65,6 +69,8 @@ public class CorrectionBoot implements ApplicationContextAware {
         }
         CorrectionExecutor correctionExecutor;
         for (String correctionLocatorName : correctionLocatorMap.keySet()) {
+            logger.info("A correction loader named '" + correctionLocatorName +
+                    "' starts to execute, it will have the following correction information:");
             CorrectionLoader correctionLoader = correctionLocatorMap.get(correctionLocatorName);
             List<Correction> corrections = correctionLoader.getCorrections();
             for (Correction correction : corrections) {
@@ -76,13 +82,15 @@ public class CorrectionBoot implements ApplicationContextAware {
 
     /**
      * <img src='../../../../../../../../../../docs/image/执行订正逻辑流程图.png' width=600 height=500 />
+     *
      * @param correctionExecutor 订正执行器
-     * @param correction 订正
+     * @param correction         订正
      */
     private void doExecute(CorrectionExecutor correctionExecutor,
-                         Correction correction) {
+                           Correction correction) {
         LogicChain logicChain = newLogicChain(correction);
         int size = getSourceDataSize(correction);
+        long startTime = System.currentTimeMillis();
         for (int i = 0; i < size; i++) {
             Map<Class<?>, Object> curIndexSourceData = new HashMap<>();
             Map<Class<?>, List<?>> sourceData = correction.getSourceData();
@@ -93,10 +101,15 @@ public class CorrectionBoot implements ApplicationContextAware {
             correctionExecutor.setCurIndexSourceData(curIndexSourceData);
             correctionExecutor.execute(logicChain);
         }
+        long endTime = System.currentTimeMillis();
+        logger.info(size + " pieces of data have been corrected " +
+                "for the table named '" + correction.getTargetObjectClass().getSimpleName() +
+                "' cost " + (endTime - startTime) + "ms");
     }
 
     /**
      * 得到数据源的长度
+     *
      * @param correction 订正
      * @return 数据源的长度
      */
@@ -119,6 +132,7 @@ public class CorrectionBoot implements ApplicationContextAware {
 
     /**
      * 根据订正对象中的内容，生成一条逻辑链
+     *
      * @param correction 订正对象
      * @return 逻辑链
      */
@@ -132,6 +146,7 @@ public class CorrectionBoot implements ApplicationContextAware {
      * <ul>
      *     <li> 判断每个订正中的所有来源数据的数据量是否一样 {@link #sameSize(Map)}
      * </ul>
+     *
      * @param correctionLocatorMap 所有订正加载器
      * @return 是否支持订正
      */
@@ -150,6 +165,7 @@ public class CorrectionBoot implements ApplicationContextAware {
 
     /**
      * 判断一个订正中的所有来源数据的数据量是否一样
+     *
      * @param sourceData 来源数据
      * @return 数据量是否一样
      */

@@ -10,17 +10,14 @@ import java.util.Map;
  * @author Haixin Wu
  * @since 1.0.0
  */
-public abstract class Logic implements Runnable {
+public abstract class Logic {
 
     /**
+     * <img src='../../../../../../../../../docs/image/执行订正逻辑流程图.png' width=600 height=500 />
      * 设置某一列中的订正逻辑
-     * @param sourceDataClass
-     * @param targetObject
+     * @param sourceDataClass 来源数据
+     * @param targetObject 目标表数据
      */
     public abstract void set(Map<Class<?>, ?> sourceDataClass, Object targetObject);
 
-    @Override
-    public void run() {
-
-    }
 }
