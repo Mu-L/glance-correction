@@ -29,7 +29,7 @@
 
 ### 第一步：下载项目
 
-* 下载 [zip](https://git.zhonganinfo.com/wuhaixin/datacorrection/-/archive/master/datacorrection-master.zip)
+* 下载 [zip](https://github.com/RovingSea/glance-correction/archive/refs/heads/develop.zip)
 * 从 git 仓库拉取
   ```git
   https://github.com/RovingSea/glance-correction.git
