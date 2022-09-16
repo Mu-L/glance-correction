@@ -4,7 +4,6 @@ import io.github.rovingsea.glancecorrection.core.datasource.Connection;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * 订正执行器，最后将会借助数据库连接对象 {@link Connection} 来完成 insert 操作
@@ -22,18 +21,12 @@ public class CorrectionExecutor {
      */
     private final Class<?> targetObjectClass;
 
-    /**
-     * 由于使用多线程初始化目标表对象，它将会等待最后一个线程结束后才允许执行 insert
-     */
-    private final CountDownLatch countDownLatch;
-
     private final ExecutionAroundProcessor executionAroundProcessor;
 
-    public CorrectionExecutor(Connection conn, Class<?> targetObjectClass, int targetTableColumnSize,
+    public CorrectionExecutor(Connection conn, Class<?> targetObjectClass,
                               ExecutionAroundProcessor executionAroundProcessor) {
         this.conn = conn;
         this.targetObjectClass = targetObjectClass;
-        this.countDownLatch = new CountDownLatch(targetTableColumnSize);
         this.executionAroundProcessor = executionAroundProcessor;
     }
 
@@ -59,12 +52,6 @@ public class CorrectionExecutor {
 
         for (LogicChain.SubItem subItem : chain) {
             executeLogic(subItem, instance);
-        }
-
-        try {
-            this.countDownLatch.await();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
 
         if (executionAroundProcessor == null) {
