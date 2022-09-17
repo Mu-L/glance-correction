@@ -67,7 +67,7 @@ public class CorrectionExecutor {
     }
 
     /**
-     * 使用线程执行某一个逻辑
+     * 执行逻辑链
      *
      * @param subItem  逻辑
      * @param instance 目标表的实例，或者说某一行
