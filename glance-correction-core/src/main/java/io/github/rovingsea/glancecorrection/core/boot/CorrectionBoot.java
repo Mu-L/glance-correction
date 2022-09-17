@@ -11,6 +11,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -31,29 +32,25 @@ public class CorrectionBoot implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
-    public ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
-    @Override
-    public void setApplicationContext(@NonNull ApplicationContext applicationContextTemp)
-            throws BeansException {
-        applicationContext = applicationContextTemp;
-    }
-
     /**
      * 所有的订正加载器，只要实现了 {@link CorrectionConfiguration} 就会视为一个订正加载器
      */
     private Map<String, CorrectionLoader> correctionLocatorMap;
 
+    private ThreadPoolTaskExecutor executor;
+
     @PostConstruct
     private void initialize() {
         initCorrectionActuator(getApplicationContext());
+        initThreadPoolTaskExecutor(getApplicationContext());
     }
 
-    private void initCorrectionActuator(ApplicationContext applicationContext) {
-        this.correctionLocatorMap =
-                applicationContext.getBeansOfType(CorrectionLoader.class);
+    private void initCorrectionActuator(ApplicationContext context) {
+        this.correctionLocatorMap = context.getBeansOfType(CorrectionLoader.class);
+    }
+
+    private void initThreadPoolTaskExecutor(ApplicationContext context) {
+        this.executor = (ThreadPoolTaskExecutor) context.getBean("taskExecutor");
     }
 
     /**
@@ -67,15 +64,14 @@ public class CorrectionBoot implements ApplicationContextAware {
         if (!supports(correctionLocatorMap)) {
             return;
         }
-        CorrectionExecutor correctionExecutor;
         for (String correctionLocatorName : correctionLocatorMap.keySet()) {
             logger.info("A correction loader named '" + correctionLocatorName +
                     "' starts to execute, it will have the following correction information:");
             CorrectionLoader correctionLoader = correctionLocatorMap.get(correctionLocatorName);
             List<Correction> corrections = correctionLoader.getCorrections();
             for (Correction correction : corrections) {
-                correctionExecutor = newCorrectionExecutor(correction);
-                doExecute(correctionExecutor, correction);
+                CorrectionExecutor correctionExecutor = newCorrectionExecutor(correction);
+                executor.execute(() -> doExecute(correctionExecutor, correction));
             }
         }
     }
@@ -180,6 +176,16 @@ public class CorrectionBoot implements ApplicationContextAware {
         Collection<List<?>> values = sourceData.values();
         // 从第二个开始，要求每个长度都要和第一个相等
         return values.stream().skip(1).allMatch(data -> data.size() == finalSize);
+    }
+
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    @Override
+    public void setApplicationContext(@NonNull ApplicationContext applicationContextTemp)
+            throws BeansException {
+        applicationContext = applicationContextTemp;
     }
 
 }
