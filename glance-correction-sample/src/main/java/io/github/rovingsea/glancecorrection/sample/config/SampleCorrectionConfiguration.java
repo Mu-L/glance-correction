@@ -28,7 +28,7 @@ public class SampleCorrectionConfiguration implements CorrectionConfiguration {
     @Autowired
     private From2Mapper from2Mapper;
 
-    @Bean
+    @Bean(name = "to1")
     @Override
     public CorrectionLoader setConfiguration(CorrectionLoaderBuilder builder) {
         QueryWrapper<From1> queryWrapper1 = new QueryWrapper<>();
