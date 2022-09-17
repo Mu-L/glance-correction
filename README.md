@@ -142,3 +142,6 @@
 * 更多使用详情见：[使用文档](使用文档.md)
 
   
+## 关于项目
+### Star 趋势
+![Star 趋势](https://starchart.cc/RovingSea/glance-correction.svg)
