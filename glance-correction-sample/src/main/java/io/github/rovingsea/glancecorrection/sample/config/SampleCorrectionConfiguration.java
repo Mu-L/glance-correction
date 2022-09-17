@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Haixin Wu
- * @since 1.0
+ * @since 1.0.1
  */
 @Configuration
 public class SampleCorrectionConfiguration implements CorrectionConfiguration {

@@ -10,10 +10,10 @@ import io.github.rovingsea.glancecorrection.core.boot.CorrectionBoot;
  * 将由 spring.factories 进行 SPI
  *
  * @author Haixin Wu
- * @since 1.0.0
+ * @since 1.0.1
  */
 @Configuration
-public class DataCorrectionAutoConfiguration {
+public class GlanceCorrectionAutoConfiguration {
 
     @Bean
     public CorrectionBoot correctionBoot() {

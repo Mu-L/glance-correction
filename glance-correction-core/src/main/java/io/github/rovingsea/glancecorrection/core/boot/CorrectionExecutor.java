@@ -9,7 +9,7 @@ import java.util.Map;
  * 订正执行器，最后将会借助数据库连接对象 {@link Connection} 来完成 insert 操作
  *
  * @author Haixin Wu
- * @since 1.0.0
+ * @since 1.0.1
  */
 public class CorrectionExecutor {
     /**

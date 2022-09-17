@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  io.github.rovingsea.glancecorrection.core.spring.DataCorrectionAutoConfiguration\
+  io.github.rovingsea.glancecorrection.core.spring.GlanceCorrectionAutoConfiguration\

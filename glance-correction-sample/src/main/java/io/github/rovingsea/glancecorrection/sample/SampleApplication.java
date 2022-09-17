@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * @author Haixin Wu
- * @since 1.0
+ * @since 1.0.1
  */
 @SpringBootApplication
 public class SampleApplication {

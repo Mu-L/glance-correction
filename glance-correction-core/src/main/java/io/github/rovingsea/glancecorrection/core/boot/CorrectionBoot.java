@@ -24,7 +24,7 @@ import java.util.*;
  * </p>
  *
  * @author Haixin Wu
- * @since 1.0.0
+ * @since 1.0.1
  */
 public class CorrectionBoot implements ApplicationContextAware {
 

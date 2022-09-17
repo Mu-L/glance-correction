@@ -9,7 +9,7 @@ import java.util.Map;
 
 /**
  * @author Haixin Wu
- * @since 1.0
+ * @since 1.0.1
  */
 public class NameAndAgeLogic extends Logic {
     @Override
